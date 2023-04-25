@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Realm Chat</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="enteruser">
+        <input type="text" id="username" name="username" placeholder="Enter your username...">
+        <button type="button" id="usernameButton">Set</button>
+    </div>
+    <div class="chat-wrapper">
+        <div id="chatbox"></div>
+    </div>
+
+    <form id="chatform">
+        <input type="text" id="message" autocomplete="off" placeholder="Send a message...">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        const chatbox = document.getElementById("chatbox");
+        const chatform = document.getElementById("chatform");
+        const message = document.getElementById("message");
+        const usernameInput = document.getElementById("username");
+        const usernameButton = document.getElementById("usernameButton");
+        let username = null;
+
+        const ws = new WebSocket("ws://localhost:8080/ws");
+
+        ws.onopen = function() {
+            console.log("WebSocket connection established.");
+        };
+
+        ws.onerror = function(event) {
+            console.error("WebSocket error:", event);
+        };
+
+
+        chatform.onsubmit = function(event) {
+            event.preventDefault();
+            if (!username) {
+                alert("Please enter a username first.");
+                return;
+            }
+            ws.send(JSON.stringify({ username: username, message: message.value }));
+            console.log("Message sent:", { username: username, message: message.value });
+            message.value = "";
+        };
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const messageEl = document.createElement("p");
+            if (data.username) {
+                messageEl.textContent = `${data.username}: ${data.message}`;
+            } else {
+                messageEl.textContent = data.message;
+            }
+            chatbox.appendChild(messageEl);
+        }
+
+
+
+        usernameButton.onclick = function(event) {
+            event.preventDefault();
+            username = usernameInput.value.trim();
+            if (!username) {
+                alert("Please enter a valid username.");
+                return;
+            }
+            usernameInput.disabled = true;
+            usernameButton.disabled = true;
+            ws.send(JSON.stringify({ username: username, message: "" }));
+        };
+
+    </script>
+</body>
+</html>

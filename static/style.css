@@ -1,0 +1,130 @@
+/* Overall body styles */
+body {
+    font-family: 'Helvetica Neue', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #36393F;
+}
+
+.enteruser {
+    /* center the div */
+    position: fixed;
+    top: 5vh;
+    /* center on page with 10px from the right and left of the page */
+    left: 25vw;
+    right: 25vw;
+    /* center elements inside the div */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+}
+
+#enteruserlabel {
+    color: #DCDDDE;
+    font-size: 14px;
+}
+
+/* Chatbox styles */
+#chatbox {
+    position: fixed;
+    top: 20vh;
+    /* center on page with 10px from the right and left of the page */
+    left: 3vw;
+    right: 3vw;
+    height: 400px;
+    overflow-y: scroll;
+    padding: 10px;
+    /* have a black border and rounded corners */
+    border: 3px solid #000000;
+    border-radius: 20px;
+    /* make the scroll bar fit in the box */
+    box-sizing: border-box;
+}
+
+/* Chat message styles */
+#chatbox p {
+    margin: 0;
+    padding: 0;
+    color: #DCDDDE;
+    font-size: 14px;
+    line-height: 18px;
+}
+
+#chatbox p span {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+/* Form styles */
+#chatform {
+    position: fixed;
+    bottom: 5vh;
+    /* center on page with 10px from the right and left of the page */
+    left: 20vw;
+    right: 20vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #36393F;
+}
+
+#message {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 14px;
+    background-color: #40444B;
+    border: none;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 10px;
+    color: #DCDDDE;
+}
+
+#message:focus {
+    outline: none;
+}
+
+button[type="submit"] {
+    padding: 10px;
+    font-size: 14px;
+    color: #DCDDDE;
+    background-color: #7289DA;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+button[type="submit"]:hover {
+    background-color: #677BC4;
+}
+
+/* Username input styles */
+#username {
+    padding: 10px;
+    font-size: 14px;
+    background-color: #40444B;
+    border: none;
+    color: #DCDDDE;
+    margin-right: 10px;
+    margin-left: 10px;
+    border-radius: 10px;
+}
+
+#username:focus {
+    outline: none;
+}
+
+button[type="button"] {
+    padding: 10px;
+    font-size: 14px;
+    color: #DCDDDE;
+    background-color: #7289DA;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+button[type="button"]:hover {
+    background-color: #677BC4;
+}
