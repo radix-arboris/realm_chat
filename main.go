@@ -25,13 +25,9 @@ var upgrader = websocket.Upgrader{
 var serverPort = 8080
 
 var logDirectory = "chatlogs"
-
-// get a timestamp with year, month, day, hour, and minute
-var timestamp = time.Now().Format("2006-01-02-15-04")
+var timestamp = time.Now().Format("2006-01-02-15-04") // get a timestamp with year, month, day, hour, and minute
 var logFile = fmt.Sprintf("%s-chat.log", timestamp)
-
-// join the path of the logs folder and the logfile
-var logPath = fmt.Sprintf("%s/%s", logDirectory, logFile)
+var logPath = fmt.Sprintf("%s/%s", logDirectory, logFile) // join the path of the logs folder and the logfile
 
 // create the logs folder if it doesn't exist
 func init() {
@@ -93,10 +89,7 @@ func main() {
 		clients = append(clients, client)
 
 		// Log list of current clients
-		log.Println("Current clients:")
-		for _, c := range clients {
-			log.Println(c.username)
-		}
+		logClients()
 
 		// Send welcome message to the user
 		welcomeMsg := message{Message: fmt.Sprintf("Welcome, %s!", username)}
@@ -108,14 +101,7 @@ func main() {
 
 		// Broadcast message to all connected clients that a new user has joined
 		newUserMsg := message{Message: fmt.Sprintf("%s has joined the chat", username)}
-		for _, c := range clients {
-			err = c.conn.WriteJSON(newUserMsg)
-			if err != nil {
-				log.Println(err)
-				break
-			}
-		}
-
+		broadcastMessage(newUserMsg)
 		logMessage(username, newUserMsg.Message)
 
 		// Log and broadcast first message
@@ -128,14 +114,7 @@ func main() {
 
 		if firstMsg.Message != "" {
 			// Broadcast message to all connected clients including the sender
-			for _, c := range clients {
-				err = c.conn.WriteJSON(firstMsg)
-				if err != nil {
-					log.Println(err)
-					break
-				}
-			}
-
+			broadcastMessage(firstMsg)
 			logMessage(username, firstMsg.Message)
 		}
 
@@ -150,15 +129,15 @@ func main() {
 
 			if msg.Message != "" {
 				// Broadcast message to all connected clients including the sender
-				for _, c := range clients {
-					err = c.conn.WriteJSON(msg)
-					if err != nil {
-						log.Println(err)
-						break
-					}
-				}
-
+				broadcastMessage(msg)
 				logMessage(username, msg.Message)
+			} else {
+				// send a message to the client saying to enter text in the message
+				err = conn.WriteJSON(message{Message: "Please enter text in the message"})
+				if err != nil {
+					log.Println(err)
+					break
+				}
 			}
 
 		}
@@ -180,6 +159,7 @@ func main() {
 				}
 
 				logMessage(username, userLeftMsg.Message)
+				logClients()
 			}
 		}
 	})
@@ -199,12 +179,16 @@ func main() {
 	waitForSignal()
 }
 
+// if server is shutdown
+
 func waitForSignal() {
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
 	<-signalCh
 	log.Println("Shutdown signal received, exiting...")
 }
+
+// keep track of messages
 
 func logMessage(username string, message string) {
 	log.Printf("Received message from %s: %s\n", username, message)
@@ -223,4 +207,32 @@ func logMessage(username string, message string) {
 		log.Println(err)
 	}
 	f.Close()
+}
+
+// keep track of current clients
+
+func logClients() {
+
+	// Log list of current clients
+	var current_clients = "Current clients: | "
+
+	log.Println("Current clients:")
+	for _, c := range clients {
+		log.Println(c.username)
+		current_clients += fmt.Sprintf("%s | ", c.username)
+	}
+
+	logMessage("System", current_clients)
+}
+
+// send messages to all clients
+
+func broadcastMessage(msg message) {
+	for _, c := range clients {
+		err := c.conn.WriteJSON(msg)
+		if err != nil {
+			log.Println(err)
+			break
+		}
+	}
 }
